@@ -11,6 +11,7 @@ fi
 
 cd ${GOPATH}/src/github.com/elastic/beats
 git checkout $BRANCH
+git pull
 
 IFS=","
 BEATS_ARRAY=($BEATS)
@@ -21,8 +22,21 @@ do
     cd $BEAT
     go build
 
+    # list files for debugging in case beats are not available
+    ls
+
+    SUFFIX=""
+
+    if [[ -z "${GOOS}" ]]; then
+	  echo "No GOOS set. This might be ok, when using linux/arm e. g."
+      else
+	  if [ "${GOOS}" = "windows" ]; then
+		  SUFFIX=".exe"
+	  fi
+    fi
+
     #+make
-    cp $BEAT /build
+    cp "$BEAT$SUFFIX" /build || true
     cd ..
 
 done

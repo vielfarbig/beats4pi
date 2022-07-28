@@ -2,7 +2,9 @@
 
 Docker image to build elastic/beats for Raspberry Pi
 
-**NEW 2022** Changes to work more robust without mage and newer golang version.
+**NEW 2022**
+- Changes to work more robust without mage and newer golang version.
+- Support windows/386 build
 
 Original: https://github.com/andig/beats4pi
 
@@ -10,24 +12,33 @@ Original: https://github.com/andig/beats4pi
 
 The image has a couple of ENV vars that can be used for customizing what and how to build:
 
+arm/7:
   - `GOARCH=arm` - the target architecture, arm for RaspberryPi
   - `GOARM=7` - ARM architecture version - 7 for RasperryPi 3
+
+windows/386:
+  - `GOARM=386` - the target architecture, 386 for 32 bit
+  - `GOOS=windows` - the target OS, windows generally for Windows OS
+
+Note: The windows build have `.exe` suffixes in the output files, the linux ones not.
+
+both:
   - `BEATS=filebeat,metricbeat` - comma-separated list of beats to compile
-  - `BEATS_VERSION=8.2.0` - version to compile
+  - `BEATS_VERSION=8.3.0` - version to compile
 
 ## Building elastic beats
 
 This command will output the build result in the current folder:
 
     docker build --tag="beats4pi" .
-    docker run -v $(pwd):/build -e BEATS_VERSION=8.2.0 beats4pi
+    docker run -v $(pwd):/build -e BEATS_VERSION=8.3.0 beats4pi
     
 ## Other
 
 To test the build script without re-downloading elastic/beats you can clone it once and then map the cloned folder into the images' `GOPATH`:
 
     git clone https://github.com/elastic/beats
-    docker run -v $(pwd)/beats:/go/src/github.com/elastic/beats beats4pi
+    docker run -v $(pwd)/beats:/go/src/github.com/elastic/beats -v $(pwd):/build -e BEATS_VERSION=8.3.0 beats4pi
 
 See https://gist.github.com/andig/650915e02b18cfe38de6516686977bca for an approach how to manually build beats with the various configurations required natively on a RaspberryPi 3.
 
